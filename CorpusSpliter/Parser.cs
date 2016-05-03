@@ -20,5 +20,16 @@ namespace CorpusSpliter
             this._regex = new Regex(regexString, RegexOptions.Singleline);
         }
         public MatchCollection Matches(string text) { return this._regex.Matches(text); }
+        [Obsolete("This function is unfinished")]
+        public List<Tuple<string>> ExtractToList(string text)
+        {
+            var matchCollections = this._regex.Matches(text);
+            var ret = new List<List<string>>();
+            foreach (var x in matchCollections)
+            {
+//                ret.Add(new List<string>(x))
+            }
+            return null;
+        }
     }
 }

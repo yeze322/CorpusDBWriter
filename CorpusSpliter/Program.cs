@@ -20,7 +20,6 @@ namespace CorpusSpliter
             var itemList = pattern.itemNameList;
 
             var matchCollections = new Parser(pattern.Regex).Matches(text);
-            
             string middle = matchCollections[0].Groups[1].Value;
         }
     }
