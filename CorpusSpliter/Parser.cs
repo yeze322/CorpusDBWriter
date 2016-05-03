@@ -24,15 +24,18 @@ namespace CorpusSpliter
     public class PatternGenerator
     {
         private string[] _itemNames = null;
-        private static readonly string _bodyMatchRegex = @"\s*: (.*)\r\n";
+        private static string _prefixRegex = @"";
+        private static string _bodyRegex = @"\s*: (.*)\r\n";
+        private static string _suffixRegex = @"\r\n--------------------------------------------------------------------------------------";
+        [Obsolete("this APi is consturcted from filename. abandoned")]
         public PatternGenerator(string fname)
         {
             this._itemNames = System.IO.File.ReadAllLines(fname);
         }
         public string Generate()
         {
-            string body = string.Join(_bodyMatchRegex, this._itemNames);
-            string suffix = _bodyMatchRegex;
+            string body = string.Join(_bodyRegex, this._itemNames);
+            string suffix = _bodyRegex;
             return body + suffix;
         }
     }
