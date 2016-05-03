@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CorpusSpliter
 {
-    public class PatternGenerator
+    public class CorpusPattern
     {
         #region const member
         private static string _prefixRegex = @"";
@@ -14,7 +14,7 @@ namespace CorpusSpliter
         private static string _suffixRegex = @"\r\n--------------------------------------------------------------------------------------";
         #endregion
         public readonly string[] itemNameList = null;
-        public PatternGenerator(string configFile)
+        public CorpusPattern(string configFile)
         {
             this.itemNameList = System.IO.File.ReadAllLines(configFile);
         }

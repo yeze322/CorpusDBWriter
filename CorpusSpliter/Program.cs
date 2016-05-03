@@ -15,10 +15,12 @@ namespace CorpusSpliter
         static void Main(string[] args)
         {
             string text = System.IO.File.ReadAllText(fname);
-            var pattern = new PatternGenerator(
+            var pattern = new CorpusPattern(
                 @"D:\BingAdsPrj\CorpusSpliter\CorpusSpliter\bin\Debug\ItemName.txt");
-            Parser ps = new Parser(pattern.Regex);
-            var matchCollections = ps.Matches(text);
+            var itemList = pattern.itemNameList;
+
+            var matchCollections = new Parser(pattern.Regex).Matches(text);
+            
             string middle = matchCollections[0].Groups[1].Value;
         }
     }
