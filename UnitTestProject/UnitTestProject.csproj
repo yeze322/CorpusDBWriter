@@ -58,6 +58,10 @@
       <Project>{2e577825-6002-45ef-aac4-476b30e52ff7}</Project>
       <Name>CorpusSpliter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DBController\DBController.csproj">
+      <Project>{e5d9a424-3758-4489-9443-8c24b1707e0f}</Project>
+      <Name>DBController</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

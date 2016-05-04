@@ -1,0 +1,25 @@
+Item Number : x
+Incident ID : int
+Product Name : str
+ClassificationPath : str
+Unit of Work : int
+Create Date : time
+Created By : string
+Import Date : time
+Work Group : string
+Support Offering : string
+Problem Type : string
+Form Factor : string
+Company Name : str
+Incident Status : s
+Modified By : s
+Modified Date : time
+Reviewer Comments : str
+Incident Title : s
+Prod Class Type : s
+MSSolve SR Number : int
+Number of Views : i
+Number of Votes : i
+Number of Messages : i
+Number of Unique Users : i
+CaseNotes : string

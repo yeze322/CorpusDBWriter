@@ -24,17 +24,26 @@ namespace CorpusSpliter
         {
             get
             {
-                if (regex == null)
+                if (this.regex == null)
                 {
                     this.regex = _prefixRegex
                         + string.Join(_bodyRegex, this.itemNameList) + _bodyRegex 
                         + _suffixRegex;
-                    return this.regex;
                 }
-                else
+                return this.regex;
+            }
+        }
+        private string tableHeader = null;
+        public string TableHeader
+        {
+            get
+            {
+                if (this.tableHeader == null)
                 {
-                    return this.regex;
+                    string header = "(" + string.Join(",", this.itemNameList) + ")";
+                    header.Replace(" ", "");
                 }
+                return this.tableHeader;
             }
         }
     }
