@@ -12,13 +12,12 @@ namespace DBController
     using SQLAddParaFunc = Func<SqlCommand, string, string, SqlParameter>;
     public class DBController
     {
-        private readonly string testToken =
-            @"Server=YEZE-PC;Database=AdventureWorks2014;
-            User ID=yezetest;Password=950322;";
         private SqlConnection _connection = null;
-        public DBController(string token)
+        private readonly DBInfo dbinfo = null;
+        public DBController(string connectToken, DBInfo dbinfo)
         {
-            this._connection = new SqlConnection(token);
+            this.dbinfo = dbinfo;
+            this._connection = new SqlConnection(connectToken);
             try
             {
                 this._connection.Open();
@@ -58,7 +57,7 @@ namespace DBController
             return ret;
         }
 
-        private static Dictionary<string, SQLAddParaFunc> delegateDic = new Dictionary<string, SQLAddParaFunc>
+        private static Dictionary<string, SQLAddParaFunc> dbAddParaLambdaDic = new Dictionary<string, SQLAddParaFunc>
         {
             { "INT", (cmd, col, val) => {
                 return cmd.Parameters.AddWithValue("@"+col, val == "" ? -1 : int.Parse(val));
@@ -68,25 +67,30 @@ namespace DBController
         };
 
         // issues: @tableHeader do not contain columns' data type. will use json
-        public bool InsertRegexMatch(string tableName, List<string> tableHeaderList, List<string> dataTypeList, Match match)
+        public bool InsertRegexMatch(string tableName, Match match)
         {
-            var queryItemPattern = $"({string.Join(",", tableHeaderList)})";
-            var queryValuePattern = $"(@{string.Join(",@", tableHeaderList)})";
+            var queryItemPattern = $"({string.Join(",", this.dbinfo.columnNameList)})".Replace(" ", "");
+            var queryValuePattern = $"(@{string.Join(",@", this.dbinfo.columnNameList)})".Replace(" ", "");
 
-            var query = $"INSERT into {tableName} {queryItemPattern} VALUES {queryValuePattern}";
-            var cmd = this.getSQLCommand(query);
+            var queryText = $"INSERT into {tableName} {queryItemPattern} VALUES {queryValuePattern}";
+            var insertCommand = this.getSQLCommand(queryText);
 
             //usage:
             //delegateDic["INT"](tableHeaderList[0], match.Groups[0].Value);
-
-            for (int i = 0; i < tableHeaderList.Count; i++)
+            for (int i = 0; i < this.dbinfo.columnNameList.Count; i++)
             {
-                delegateDic[dataTypeList[i]](cmd, tableHeaderList[i], match.Groups[i + 1].Value);
+                var dataType = this.dbinfo.dataTypeList[i];
+                var columnName = this.dbinfo.columnNameList[i];
+                dbAddParaLambdaDic[this.dbinfo.dataTypeList[i]](
+                    insertCommand,
+                    columnName,
+                    match.Groups[i+1].Value
+                    );
             }
 
             try
             {
-                cmd.ExecuteNonQuery();
+                insertCommand.ExecuteNonQuery();
                 return true;
             }
             catch
