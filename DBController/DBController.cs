@@ -27,10 +27,6 @@ namespace DBController
                 throw;
             }
         }
-        ~DBController()
-        {
-            this._connection.Close();
-        }
         public List<List<string>> ExecuteQuery(string request)
         {
             var cmd = new SqlCommand(request, this._connection);
@@ -82,7 +78,16 @@ namespace DBController
                 {
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
                     this.setInsertCommandValue(cmd, match);
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        Console.WriteLine($"Insert: {match.Groups[1].Value}");
+                        successCount += 1;
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"Duplicate Incident: {match.Groups[1].Value}");
+                    }
                 }
                 transaction.Commit();
             }

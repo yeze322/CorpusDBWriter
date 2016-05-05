@@ -9,9 +9,9 @@ namespace CorpusSpliter
 {
     class Program
     {
-        private static string CORPUS_FILE_NAME = @"Phone and email_Targeting.txt";
         #region obselete test config
-        private static string TEST_TOKEN =@"Server=YEZE-PC;Database=AdventureWorks2014;User ID=yezetest;Password=950322;";
+        private static string CORPUS_FILE_NAME = @"../Phone and email_Targeting.txt";
+        private static string TEST_TOKEN = @"Server=YEZE-PC;Database=AdventureWorks2014;User ID=yezetest;Password=950322;";
         private static string TEST_TABLENAME = @"HumanResources.Department";
         private static string TEST_TABLEHEADER = @"(Name, GroupName, ModifiedDate)";
         #endregion
@@ -19,23 +19,29 @@ namespace CorpusSpliter
         private static string TABLE_NAME = @"dbo.Incidents";
         static void Main(string[] args)
         {
-            string text = System.IO.File.ReadAllText(CORPUS_FILE_NAME);
-            var pattern = new CorpusInfo(@"ItemList.txt", @"DataTypeDiction.json");
+            var pattern = new CorpusInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
+            string [] flist = System.IO.Directory.GetFiles("./Corpus");
+            int newCount = 0;
+            foreach (var fname in flist)
+            {
+                Console.WriteLine("Importing file : " + fname + "...");
+                string text = System.IO.File.ReadAllText(fname);
+                var matchCollections = new Parser(pattern.regex).Matches(text);
+                var db = new DBController.DBController(ZIM_TOKEN, pattern.dbinfo);
+                newCount += db.BatchInsertRegexCollections(TABLE_NAME, matchCollections);
+                //var db = new DBController.DBController(TEST_TOKEN);
+                //db.InsertRegexMatch(TEST_TABLENAME, TEST_TABLEHEADER, matchCollections[0]);
 
-            var matchCollections = new Parser(pattern.regex).Matches(text);
-            
-            var db = new DBController.DBController(ZIM_TOKEN, pattern.dbinfo);
-            // insert one by one
-            //foreach(Match match in matchCollections)
-            //{
-            //    db.InsertSingleRegexMatch(TABLE_NAME, match);
-            //}
-            // batch insert
-            int succCOunt = db.BatchInsertRegexCollections(TABLE_NAME, matchCollections);
-            //var db = new DBController.DBController(TEST_TOKEN);
-            //db.InsertRegexMatch(TEST_TABLENAME, TEST_TABLEHEADER, matchCollections[0]);
-
-            db.ClearTable(TABLE_NAME, "Id");
+                //db.ClearTable(TABLE_NAME, "Id");
+            }
+            Console.WriteLine("===================================");
+            Console.WriteLine($"      Add Items :  {newCount}");
+            Console.WriteLine("===================================");
+            for(int i = 3; i >0; i--)
+            {
+                Console.WriteLine($"exit in {i} seconds...");
+                System.Threading.Thread.Sleep(1000);
+            }
         }
     }
 }
