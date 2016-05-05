@@ -18,7 +18,14 @@ namespace DBController
         public DBController(string token)
         {
             this._connection = new SqlConnection(token);
-            this._connection.Open();
+            try
+            {
+                this._connection.Open();
+            }
+            catch
+            {
+                throw;
+            }
         }
         private SqlCommand getSQLCommand(string request)
         {
@@ -49,14 +56,28 @@ namespace DBController
             }
             return ret;
         }
-        public bool InsertRegexMatch(string tablename, Match match, List<string> valueList)
+        // issues: @tableHeader do not contain columns' data type. will use json
+        public bool InsertRegexMatch(string tableName, List<string> tableHeaderList, Match match)
         {
-            //int LEN = match.Groups.Count;
-            var q = "INSERT into HumanResources.Department (Name, GroupName, ModifiedDate) VALUES (@b, @c, @d)";
-            var cmd = this.getSQLCommand(q);
-            cmd.Parameters.AddWithValue("@b", "yeze");
-            cmd.Parameters.AddWithValue("@c", "yezepc");
-            cmd.Parameters.AddWithValue("@d", DateTime.Now);
+            int itemCount = match.Groups.Count - 1;
+
+            var queryItemPattern = $"({string.Join(",", tableHeaderList)})";
+            var queryValuePattern = $"(@{string.Join(",@", tableHeaderList)})";
+
+            var query = $"INSERT into {tableName} {queryItemPattern} VALUES {queryValuePattern}";
+            var cmd = this.getSQLCommand(query);
+
+            var delegateDic = new Dictionary<string, Func<string, string, SqlParameter>>
+            {
+                { "INT", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, int.Parse(b)); } },
+                { "STRING", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, b); }},
+                { "DATETIME", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, DateTime.Parse(b)); }},
+            };
+
+            cmd.Parameters.AddWithValue("@1", "yeze");
+            cmd.Parameters.AddWithValue("@2", "yezepc");
+            cmd.Parameters.AddWithValue("@3", DateTime.Now);
+
             try
             {
                 cmd.ExecuteNonQuery();

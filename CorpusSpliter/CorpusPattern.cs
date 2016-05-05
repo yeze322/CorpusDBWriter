@@ -13,7 +13,7 @@ namespace CorpusSpliter
         private static string _bodyRegex = @"\s*: (.*?)\r\n";
         private static string _suffixRegex = @"\r\n--------------------------------------------------------------------------------------";
         #endregion
-        public readonly string[] itemNameList = null;
+        private readonly string[] itemNameList = null;
         public CorpusPattern(string configFile)
         {
             this.itemNameList = System.IO.File.ReadAllLines(configFile);
@@ -33,17 +33,16 @@ namespace CorpusSpliter
                 return this.regex;
             }
         }
-        private string tableHeader = null;
-        public string TableHeader
+        private List<string> tableHeaderList = null;
+        public List<string> TableHeaderList
         {
             get
             {
-                if (this.tableHeader == null)
+                if (this.tableHeaderList == null)
                 {
-                    string header = "(" + string.Join(",", this.itemNameList) + ")";
-                    header.Replace(" ", "");
+                    this.tableHeaderList = this.itemNameList.Select(x => x.Replace(" ", "")).ToList();
                 }
-                return this.tableHeader;
+                return this.tableHeaderList;
             }
         }
     }
