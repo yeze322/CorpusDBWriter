@@ -19,18 +19,18 @@ namespace CorpusSpliter
         private static string TABLE_NAME = @"dbo.Incidents";
         static void Main(string[] args)
         {
-            var pattern = new CorpusInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
             string [] flist = System.IO.Directory.GetFiles("./Corpus");
+            var dbinfo = new DBController.DBInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
+            var rootParser = new RootParser(@"./Config/ItemList.txt");
+            
             int newCount = 0;
             foreach (var fname in flist)
             {
                 Console.WriteLine("Importing file : " + fname + "...");
-                string text = System.IO.File.ReadAllText(fname);
-                var matchCollections = new Parser(pattern.regex).Matches(text);
-                var db = new DBController.DBController(ZIM_TOKEN, pattern.dbinfo);
+                string lineCache = System.IO.File.ReadAllText(fname);
+                var matchCollections = rootParser.executeMatch(lineCache);
+                var db = new DBController.DBController(ZIM_TOKEN, dbinfo);
                 newCount += db.BatchInsertRegexCollections(TABLE_NAME, matchCollections);
-                //var db = new DBController.DBController(TEST_TOKEN);
-                //db.InsertRegexMatch(TEST_TABLENAME, TEST_TABLEHEADER, matchCollections[0]);
 
                 //db.ClearTable(TABLE_NAME, "Id");
             }

@@ -7,29 +7,29 @@ using System.Text.RegularExpressions;
 
 namespace CorpusSpliter
 {
-    // need to add profile
-    public class Parser
+    public interface IParser
     {
+        MatchCollection executeMatch(string text);
+    }
+    public class RootParser : IParser
+    {
+        #region const member
+        private static string _prefixRegex = @"";
+        private static string _bodyRegex = @"\s*: (.*?)\r\n";
+        private static string _suffixRegex = @"\r\n--------------------------------------------------------------------------------------";
+        #endregion
+        private string _reString = null;
         private Regex _regex = null;
         // Constructor:
         //  @pattern - re expression which is bounded to a specific class
-        public Parser(string regexString)
+        public RootParser(string itemListFile)
         {
+            var itemListArray = System.IO.File.ReadAllLines(itemListFile);
             //@RegexOptions.Singleline:
             //  matches every character (instead of every character except \n)
-            this._regex = new Regex(regexString, RegexOptions.Singleline);
+            this._reString = _prefixRegex + string.Join(_bodyRegex, itemListArray) + _bodyRegex + _suffixRegex;
+            this._regex = new Regex(this._reString, RegexOptions.Singleline);
         }
-        public MatchCollection Matches(string text) { return this._regex.Matches(text); }
-        [Obsolete("This function is unfinished")]
-        public List<Tuple<string>> ExtractToList(string text)
-        {
-            var matchCollections = this._regex.Matches(text);
-            var ret = new List<List<string>>();
-            foreach (var x in matchCollections)
-            {
-//                ret.Add(new List<string>(x))
-            }
-            return null;
-        }
+        public MatchCollection executeMatch(string text) { return this._regex.Matches(text); }
     }
 }

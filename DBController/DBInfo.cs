@@ -13,8 +13,13 @@ namespace DBController
         public readonly List<string> dataTypeList;
         public readonly string queryItemPattern;
         public readonly string queryValuePattern;
-        public DBInfo(string[] itemListArray, Dictionary<string,string> itemToDataTypeMap)
+        public DBInfo(string itemListFile, string dataTypeDictFile)
         {
+            string[] itemListArray = System.IO.File.ReadAllLines(itemListFile);
+            string dictFileContent = System.IO.File.ReadAllText(dataTypeDictFile);
+
+            var itemToDataTypeMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(dictFileContent);
+
             this.columnNameList = itemListArray.Select(x => x.Replace(" ", "")).ToList();
             this.dataTypeList = itemListArray.Where(k => itemToDataTypeMap.ContainsKey(k)).Select(v => itemToDataTypeMap[v]).ToList();
 
