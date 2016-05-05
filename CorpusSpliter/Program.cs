@@ -23,17 +23,19 @@ namespace CorpusSpliter
             var pattern = new CorpusInfo(@"ItemList.txt", @"DataTypeDiction.json");
 
             var matchCollections = new Parser(pattern.regex).Matches(text);
-            var x = matchCollections[0];
-
+            
             var db = new DBController.DBController(ZIM_TOKEN, pattern.dbinfo);
-            foreach(Match match in matchCollections)
-            {
-                db.InsertSingleRegexMatch(TABLE_NAME, match);
-            }
+            // insert one by one
+            //foreach(Match match in matchCollections)
+            //{
+            //    db.InsertSingleRegexMatch(TABLE_NAME, match);
+            //}
+            // batch insert
+            int succCOunt = db.BatchInsertRegexCollections(TABLE_NAME, matchCollections);
             //var db = new DBController.DBController(TEST_TOKEN);
             //db.InsertRegexMatch(TEST_TABLENAME, TEST_TABLEHEADER, matchCollections[0]);
 
-            var ret = db.ExecuteQuery($"SELECT * FROM {TABLE_NAME}");
+            db.ClearTable(TABLE_NAME, "Id");
         }
     }
 }

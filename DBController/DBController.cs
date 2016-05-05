@@ -27,18 +27,13 @@ namespace DBController
                 throw;
             }
         }
-        private SqlCommand getQueryCommand(string request)
+        ~DBController()
         {
-            return new SqlCommand
-            {
-                CommandText = request,
-                CommandType = System.Data.CommandType.Text,
-                Connection = this._connection
-            };
+            this._connection.Close();
         }
         public List<List<string>> ExecuteQuery(string request)
         {
-            var cmd = this.getQueryCommand(request);
+            var cmd = new SqlCommand(request, this._connection);
             var reader = cmd.ExecuteReader();
             var COL_NUM = reader.FieldCount;
 
@@ -65,47 +60,39 @@ namespace DBController
             { "DATETIME", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, DateTime.Parse(val)); }},
         };
 
-        private SqlCommand getInsertCommand(string tableName, Match match)
+        private void setInsertCommandValue(SqlCommand cmd, Match match)
         {
-
-            var queryText = $"INSERT into {tableName} {this.dbinfo.queryItemPattern} VALUES {this.dbinfo.queryValuePattern}";
-            var insertCommand = this.getQueryCommand(queryText);
 
             for (int i = 0; i < this.dbinfo.columnNameList.Count; i++)
             {
                 var dataType = this.dbinfo.dataTypeList[i];
                 var columnName = this.dbinfo.columnNameList[i];
 
-                dbAddParaLambdaDic[dataType](insertCommand, columnName, match.Groups[i + 1].Value);
+                dbAddParaLambdaDic[dataType](cmd, columnName, match.Groups[i + 1].Value);
             }
-            return insertCommand;
         }
         // issues: @tableHeader do not contain columns' data type. will use json
-        public bool InsertSingleRegexMatch(string tableName, Match match)
-        {
-            var insertCommand = this.getInsertCommand(tableName, match);
-            try
-            {
-                insertCommand.ExecuteNonQuery();
-                return true;
-            }
-            catch
-            {
-                Console.WriteLine($"Ducplicate key at : {match.Groups[1].Value}");
-                //caused by dump keys
-                return false;
-            }
-        }
         public int BatchInsertRegexCollections(string tableName, MatchCollection collections, int batchSize = 1000)
         {
             int successCount = 0;
-            var transaction = this._connection.BeginTransaction();
-            foreach (Match match in collections)
+            var queryText = $"INSERT into {tableName} {this.dbinfo.queryItemPattern} VALUES {this.dbinfo.queryValuePattern}";
+            using (var transaction = this._connection.BeginTransaction())
             {
-                if (this.InsertSingleRegexMatch(tableName, match)) successCount += 1;
+                foreach (Match match in collections)
+                {
+                    var cmd = new SqlCommand(queryText, this._connection, transaction);
+                    this.setInsertCommandValue(cmd, match);
+                    cmd.ExecuteNonQuery();
+                }
+                transaction.Commit();
             }
-            transaction.Commit();
             return successCount;
+        }
+        public void ClearTable(string tableName, string pkname)
+        {
+            var queryText = $"DELETE FROM {tableName} WHERE {pkname} IN (SELECT {pkname} FROM {tableName})";
+            var cmd = new SqlCommand(queryText, this._connection);
+            cmd.ExecuteNonQuery();
         }
     }
 }
