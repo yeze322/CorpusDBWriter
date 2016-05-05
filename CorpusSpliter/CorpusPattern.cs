@@ -27,7 +27,7 @@ namespace CorpusSpliter
                 if (this.regex == null)
                 {
                     this.regex = _prefixRegex
-                        + string.Join(_bodyRegex, this.itemNameList) + _bodyRegex 
+                        + string.Join(_bodyRegex, this.itemNameList) + _bodyRegex
                         + _suffixRegex;
                 }
                 return this.regex;
@@ -43,6 +43,42 @@ namespace CorpusSpliter
                     this.tableHeaderList = this.itemNameList.Select(x => x.Replace(" ", "")).ToList();
                 }
                 return this.tableHeaderList;
+            }
+        }
+        private List<string> tableDataTypeList = null;
+        public List<string> TableDataTypeList
+        {
+            get
+            {
+                if (this.tableDataTypeList == null)
+                {
+                    this.tableDataTypeList = new List<string> {
+"STRING",
+"STRING",
+"STRING",
+"INT",
+"DATETIME",
+"STRING",
+"DATETIME",
+"STRING",
+"STRING",
+"STRING",
+"STRING",
+"STRING",
+"STRING",
+"STRING",
+"DATETIME",
+"STRING",
+"STRING",
+"STRING",
+"INT",
+"INT",
+"INT",
+"INT",
+"INT",
+"STRING"};
+                }
+                return this.tableDataTypeList;
             }
         }
     }

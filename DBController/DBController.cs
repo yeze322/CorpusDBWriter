@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace DBController
 {
+    using SQLAddParaFunc = Func<SqlCommand, string, string, SqlParameter>;
     public class DBController
     {
         private readonly string testToken =
@@ -56,27 +57,32 @@ namespace DBController
             }
             return ret;
         }
-        // issues: @tableHeader do not contain columns' data type. will use json
-        public bool InsertRegexMatch(string tableName, List<string> tableHeaderList, Match match)
-        {
-            int itemCount = match.Groups.Count - 1;
 
+        private static Dictionary<string, SQLAddParaFunc> delegateDic = new Dictionary<string, SQLAddParaFunc>
+        {
+            { "INT", (cmd, col, val) => {
+                return cmd.Parameters.AddWithValue("@"+col, val == "" ? -1 : int.Parse(val));
+            } },
+            { "STRING", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, val); }},
+            { "DATETIME", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, DateTime.Parse(val)); }},
+        };
+
+        // issues: @tableHeader do not contain columns' data type. will use json
+        public bool InsertRegexMatch(string tableName, List<string> tableHeaderList, List<string> dataTypeList, Match match)
+        {
             var queryItemPattern = $"({string.Join(",", tableHeaderList)})";
             var queryValuePattern = $"(@{string.Join(",@", tableHeaderList)})";
 
             var query = $"INSERT into {tableName} {queryItemPattern} VALUES {queryValuePattern}";
             var cmd = this.getSQLCommand(query);
 
-            var delegateDic = new Dictionary<string, Func<string, string, SqlParameter>>
-            {
-                { "INT", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, int.Parse(b)); } },
-                { "STRING", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, b); }},
-                { "DATETIME", (string a, string b) => { return cmd.Parameters.AddWithValue("@"+a, DateTime.Parse(b)); }},
-            };
+            //usage:
+            //delegateDic["INT"](tableHeaderList[0], match.Groups[0].Value);
 
-            cmd.Parameters.AddWithValue("@1", "yeze");
-            cmd.Parameters.AddWithValue("@2", "yezepc");
-            cmd.Parameters.AddWithValue("@3", DateTime.Now);
+            for (int i = 0; i < tableHeaderList.Count; i++)
+            {
+                delegateDic[dataTypeList[i]](cmd, tableHeaderList[i], match.Groups[i + 1].Value);
+            }
 
             try
             {
@@ -85,7 +91,7 @@ namespace DBController
             }
             catch
             {
-                throw;
+                Console.WriteLine($"Ducplicate key at : {match.Groups[1].Value}");
                 //caused by dump keys
                 return false;
             }

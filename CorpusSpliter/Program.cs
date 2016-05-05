@@ -29,7 +29,10 @@ namespace CorpusSpliter
 
 
             var db = new DBController.DBController(ZIM_TOKEN);
-            db.InsertRegexMatch(TABLE_NAME, pattern.TableHeaderList, matchCollections[0]);
+            foreach(Match match in matchCollections)
+            {
+                db.InsertRegexMatch(TABLE_NAME, pattern.TableHeaderList, pattern.TableDataTypeList, match);
+            }
             //var db = new DBController.DBController(TEST_TOKEN);
             //db.InsertRegexMatch(TEST_TABLENAME, TEST_TABLEHEADER, matchCollections[0]);
 
