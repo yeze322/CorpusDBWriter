@@ -27,7 +27,7 @@ namespace DBController
                 throw;
             }
         }
-        private SqlCommand getSQLCommand(string request)
+        private SqlCommand getQueryCommand(string request)
         {
             return new SqlCommand
             {
@@ -36,10 +36,9 @@ namespace DBController
                 Connection = this._connection
             };
         }
-
         public List<List<string>> ExecuteQuery(string request)
         {
-            var cmd = this.getSQLCommand(request);
+            var cmd = this.getQueryCommand(request);
             var reader = cmd.ExecuteReader();
             var COL_NUM = reader.FieldCount;
 
@@ -66,28 +65,25 @@ namespace DBController
             { "DATETIME", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, DateTime.Parse(val)); }},
         };
 
-        // issues: @tableHeader do not contain columns' data type. will use json
-        public bool InsertRegexMatch(string tableName, Match match)
+        private SqlCommand getInsertCommand(string tableName, Match match)
         {
-            var queryItemPattern = $"({string.Join(",", this.dbinfo.columnNameList)})".Replace(" ", "");
-            var queryValuePattern = $"(@{string.Join(",@", this.dbinfo.columnNameList)})".Replace(" ", "");
 
-            var queryText = $"INSERT into {tableName} {queryItemPattern} VALUES {queryValuePattern}";
-            var insertCommand = this.getSQLCommand(queryText);
+            var queryText = $"INSERT into {tableName} {this.dbinfo.queryItemPattern} VALUES {this.dbinfo.queryValuePattern}";
+            var insertCommand = this.getQueryCommand(queryText);
 
-            //usage:
-            //delegateDic["INT"](tableHeaderList[0], match.Groups[0].Value);
             for (int i = 0; i < this.dbinfo.columnNameList.Count; i++)
             {
                 var dataType = this.dbinfo.dataTypeList[i];
                 var columnName = this.dbinfo.columnNameList[i];
-                dbAddParaLambdaDic[this.dbinfo.dataTypeList[i]](
-                    insertCommand,
-                    columnName,
-                    match.Groups[i+1].Value
-                    );
-            }
 
+                dbAddParaLambdaDic[dataType](insertCommand, columnName, match.Groups[i + 1].Value);
+            }
+            return insertCommand;
+        }
+        // issues: @tableHeader do not contain columns' data type. will use json
+        public bool InsertSingleRegexMatch(string tableName, Match match)
+        {
+            var insertCommand = this.getInsertCommand(tableName, match);
             try
             {
                 insertCommand.ExecuteNonQuery();
@@ -99,6 +95,17 @@ namespace DBController
                 //caused by dump keys
                 return false;
             }
+        }
+        public int BatchInsertRegexCollections(string tableName, MatchCollection collections, int batchSize = 1000)
+        {
+            int successCount = 0;
+            var transaction = this._connection.BeginTransaction();
+            foreach (Match match in collections)
+            {
+                if (this.InsertSingleRegexMatch(tableName, match)) successCount += 1;
+            }
+            transaction.Commit();
+            return successCount;
         }
     }
 }
