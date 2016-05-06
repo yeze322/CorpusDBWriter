@@ -32,15 +32,23 @@ namespace CorpusSpliter
                 string lineCache = System.IO.File.ReadAllText(fname);
                 var incidentCollections = rootParser.executeMatch(lineCache);
                 // insert stem items
-                incidentCount += dbc.BatchInsertIncidentCollections(incidentCollections, incidentTableEntity);
+                //incidentCount += dbc.BatchInsertIncidentCollections(incidentCollections, incidentTableEntity);
                 // insert dialogs
 
                 int CASENOTES_INDEX = incidentCollections[0].Groups.Count - 1;
                 Console.WriteLine("Start Insert Dialogs...");
+
+                var queryResult = dbc.ExecuteQuery(@"SELECT id, IncidentId FROM dbo.incidents");
+                Dictionary<string, int> IncidentString_Id_Map = queryResult.ToDictionary(x => x[1], x => int.Parse(x[0]));
+                
                 foreach (Match match in incidentCollections)
                 {
                     var dialogCollections = caseParser.executeMatch(match.Groups[CASENOTES_INDEX].Value);
-                    dbc.BatchInsertDialogCollections(chatlogTableEntity, dialogCollections, long.Parse(match.Groups[1].Value));
+                    dbc.BatchInsertDialogCollections(
+                        chatlogTableEntity, 
+                        dialogCollections, 
+                        IncidentString_Id_Map[match.Groups[1].Value]
+                        );
                 }
             }
             executeExitAction(incidentCount);

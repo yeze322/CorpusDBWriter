@@ -41,22 +41,25 @@ namespace DBController
                 }
                 ret.Add(row);
             }
+            //Avoid Exception:
+            //  There is already an open DataReader associated with this Command
+            reader.Close();
             return ret;
         }
 
-        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection collections, long IncidentId)
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
         {
             var queryText = chatlogTable.ToString();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
             using (var transaction = this._connection.BeginTransaction())
             {
-                int TOTAL_DIALOG_NUM = collections.Count;
+                int TOTAL_DIALOG_NUM = chatlogCollections.Count;
                 int finished = 0;
-                foreach (Match match in collections)
+                foreach (Match match in chatlogCollections)
                 {
                     //INSERT OPERATIONS
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    chatlog.registerSqlCommand(match, ref cmd, 1);
+                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
                     try
                     {
                         var ret = cmd.ExecuteNonQuery();
@@ -71,6 +74,7 @@ namespace DBController
                         Console.WriteLine($"[Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
                     }
                 }
+                //chatlog.clearState();
                 transaction.Commit();
             }
         }
