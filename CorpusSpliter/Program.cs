@@ -21,7 +21,7 @@ namespace CorpusSpliter
             string [] flist = System.IO.Directory.GetFiles("./Corpus");
             var tableInfo = new DBController.TableInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
             var rootParser = new RootParser(@"./Config/ItemList.txt");
-            var caseParser = new CaseNoteParser();
+            var caseParser = new CaseNoteParser("");
 
             var dbc = new DBController.DBController(ZIM_TOKEN, tableInfo);
 
