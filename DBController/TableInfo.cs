@@ -7,13 +7,13 @@ using Newtonsoft.Json;
 
 namespace DBController
 {
-    public class DBInfo
+    public class TableInfo
     {
         public readonly List<string> columnNameList;
         public readonly List<string> dataTypeList;
         public readonly string queryItemPattern;
         public readonly string queryValuePattern;
-        public DBInfo(string itemListFile, string dataTypeDictFile)
+        public TableInfo(string itemListFile, string dataTypeDictFile)
         {
             string[] itemListArray = System.IO.File.ReadAllLines(itemListFile);
             string dictFileContent = System.IO.File.ReadAllText(dataTypeDictFile);

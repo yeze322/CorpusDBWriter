@@ -20,7 +20,7 @@ namespace CorpusSpliter
         static void Main(string[] args)
         {
             string [] flist = System.IO.Directory.GetFiles("./Corpus");
-            var dbinfo = new DBController.DBInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
+            var dbinfo = new DBController.TableInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
             var rootParser = new RootParser(@"./Config/ItemList.txt");
             
             int newCount = 0;

@@ -33,10 +33,7 @@ namespace UnitTestProject
             CaseNoteParser cp = new CaseNoteParser();
             string testDialog = System.IO.File.ReadAllText(@"sampleDialog.txt");
             var collections = cp.executeMatch(testDialog);
-
-            Debug.WriteLine(collections[0].Groups.Count);
-            Debug.WriteLine(collections[0].Groups[1]);
-            Debug.WriteLine(collections[0].Groups[2]);
+            Assert.AreEqual(collections.Count, 8);
 
             Func<Match, int, string> mGet = (match, index) => { return match.Groups[index+1].Value; };
             //assert line equals.....

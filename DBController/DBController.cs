@@ -13,8 +13,8 @@ namespace DBController
     public class DBController
     {
         private SqlConnection _connection = null;
-        private readonly DBInfo dbinfo = null;
-        public DBController(string connectToken, DBInfo dbinfo)
+        private readonly TableInfo dbinfo = null;
+        public DBController(string connectToken, TableInfo dbinfo)
         {
             this.dbinfo = dbinfo;
             this._connection = new SqlConnection(connectToken);
