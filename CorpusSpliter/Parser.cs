@@ -32,4 +32,19 @@ namespace CorpusSpliter
         }
         public MatchCollection executeMatch(string text) { return this._regex.Matches(text); }
     }
+    public class CaseNoteParser : IParser
+    {
+        private static readonly string re_name_catch = @"([a-zA-Z]+):";
+        private static readonly string re_num2 = @"[0-9]{2}";
+        private static readonly string re_time_catch = $"(\\[{re_num2}:{re_num2}:{re_num2}\\])";
+        private static readonly string re_sentence_catch = "(.*)\r\n";
+        private static readonly string reString = $"{re_time_catch} {re_name_catch} {re_sentence_catch}";
+
+        private Regex _regex = null;
+        public CaseNoteParser()
+        {
+            this._regex = new Regex(reString);
+        }
+        public MatchCollection executeMatch(string text) { return this._regex.Matches(text); }
+    }
 }
