@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataEntity\IDataEntity.cs" />
     <Compile Include="DataEntity\ChatLog.cs" />
     <Compile Include="DataEntity\Incident.cs" />
     <Compile Include="DataEntity\QALog.cs" />

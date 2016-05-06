@@ -1,6 +1,6 @@
 ﻿namespace DataNormalizer.DataEntity
 {
-    public class QALog : IDataEntity
+    public class QALog
     {
         public int Id { get; set; }
         public string Question { get; set; }

@@ -8,18 +8,16 @@ namespace ConfigInitializer
 {
     public class TableEntity
     {
-        protected List<string> dataTypeList;
+        public readonly List<string> dataTypeList;
         protected string TABLE_NAME = null;
         protected string TABLE_ITEMS = null;
         protected string TABLE_VALUE_FORMAT = null;
         public TableEntity(string itemNameConfig, string dataTypeConfig)
         {
             var itemNameArray = System.IO.File.ReadAllLines(itemNameConfig);
-
             this.TABLE_ITEMS = string.Join(",", itemNameArray.Select(x => x.Replace(" ", "")).ToList());
             // [1,2,3....] => "@1,@2,@3..."
             this.TABLE_VALUE_FORMAT = string.Join(",", Enumerable.Range(1, itemNameArray.Length).Select(i => "@" + i.ToString()));
-
             this.dataTypeList = System.IO.File.ReadAllLines(dataTypeConfig).ToList();
         }
         public override string ToString()

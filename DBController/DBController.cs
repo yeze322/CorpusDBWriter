@@ -44,17 +44,39 @@ namespace DBController
             return ret;
         }
 
-        public int BatchInsertRegexCollections(ConfigInitializer.IncidentTableEntity targetTable, MatchCollection collections, int batchSize = 1000)
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection collections, string IncidentId)
         {
-            var incident = new DataNormalizer.DataEntity.Incident(targetTable);
+            var queryText = chatlogTable.ToString();
+            var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
+            using(var transaction = this._connection.BeginTransaction())
+            {
+                foreach(Match match in collections)
+                {
+                    //INSERT OPERATIONS
+                    var cmd = new SqlCommand(queryText, this._connection, transaction);
+                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
+                    try
+                    {
+                        var ret = cmd.ExecuteNonQuery();
+                    }catch
+                    {
+                        throw;
+                    }
+                }
+                transaction.Commit();
+            }
+        }
+        public int BatchInsert(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, ConfigInitializer.ChatlogTableEntity chatTable)
+        {
+            var queryText = incidentTable.ToString();
+            var incident = new DataNormalizer.DataEntity.Incident(incidentTable);
             int successCount = 0;
-            var queryText = targetTable.ToString();
             //var queryText = $"INSERT into {this.tableInfo.tableName} {this.tableInfo.queryItemPattern} VALUES {this.tableInfo.queryValuePattern}";
             using (var transaction = this._connection.BeginTransaction())
             {
+                var cmd = new SqlCommand(queryText, this._connection, transaction);
                 foreach (Match match in collections)
                 {
-                    var cmd = new SqlCommand(queryText, this._connection, transaction);
                     incident.registerSqlCommand(match, ref cmd);
                     try
                     {
@@ -66,6 +88,8 @@ namespace DBController
                     {
                         Console.WriteLine($"Duplicate Incident: {match.Groups[1].Value}");
                     }
+                    var dialogCollections = caseParser.executeMatch(incidentMatch.Groups[incidentMatch.Groups.Count - 1].Value);
+                    dbc.BatchInsertDialogCollections(chatlogTableEntity, dialogCollections, incidentMatch.Groups[1].Value);
                 }
                 transaction.Commit();
             }
