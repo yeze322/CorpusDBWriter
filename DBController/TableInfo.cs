@@ -9,6 +9,7 @@ namespace DBController
 {
     public class TableInfo
     {
+        public readonly string tableName = @"dbo.Incidents";
         public readonly List<string> columnNameList;
         public readonly List<string> dataTypeList;
         public readonly string queryItemPattern;

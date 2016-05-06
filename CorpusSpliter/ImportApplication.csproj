@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataEntity\ChatLog.cs" />
+    <Compile Include="DataEntity\Incident.cs" />
+    <Compile Include="DataEntity\QALog.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -59,6 +62,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ConfigInitializer\ConfigInitializer.csproj">
+      <Project>{c313fbcb-5080-449c-9a25-a33633f3adc4}</Project>
+      <Name>ConfigInitializer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DBController\DBController.csproj">
       <Project>{e5d9a424-3758-4489-9443-8c24b1707e0f}</Project>
       <Name>DBController</Name>

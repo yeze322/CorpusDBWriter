@@ -1,0 +1,10 @@
+﻿namespace CorpusSpliter.DataEntiyy
+{
+    public class QALog
+    {
+        public int Id { get; set; }
+        public string Question { get; set; }
+        public string Answer { get; set; }
+        public int IncidentId { get; set; }
+    }
+}
