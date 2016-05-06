@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBController", "DBControlle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigInitializer", "ConfigInitializer\ConfigInitializer.csproj", "{C313FBCB-5080-449C-9A25-A33633F3ADC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataNormalizer", "DataNormalizer\DataNormalizer.csproj", "{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
