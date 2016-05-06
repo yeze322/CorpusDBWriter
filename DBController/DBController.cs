@@ -49,6 +49,7 @@ namespace DBController
 
         public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
         {
+            Console.WriteLine("     [Sub-Chatlog] Inserting...");
             var queryText = chatlogTable.ToString();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
             using (var transaction = this._connection.BeginTransaction())
@@ -71,15 +72,18 @@ namespace DBController
                     ++finished;
                     if(finished%1000 == 0)
                     {
-                        Console.WriteLine($"[Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
+                        Console.WriteLine($"        [Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
                     }
                 }
                 //chatlog.clearState();
                 transaction.Commit();
+                Console.WriteLine($"     [Sub-Chatlog] Insert : Done! IncidentID = {IncidentId}");
             }
         }
-        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable)
+        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash)
         {
+            duplicateHash = new HashSet<string>();
+
             var queryText = incidentTable.ToString();
             var incident = new DataNormalizer.DataEntity.Incident(incidentTable);
             int successCount = 0;
@@ -98,7 +102,9 @@ namespace DBController
                     }
                     catch
                     {
-                        Console.WriteLine($"Duplicate Incident: {match.Groups[1].Value}");
+                        var incidentString = match.Groups[1].Value;
+                        duplicateHash.Add(incidentString);
+                        Console.WriteLine($"Duplicate Incident: {incidentString}");
                     }
                 }
                 transaction.Commit();
