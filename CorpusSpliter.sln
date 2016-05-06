@@ -7,11 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportApplication", "Corpus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{FF2A1918-CAD2-49DB-B9FD-710408402FD5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F16E87A6-0877-4A5B-AD79-43D5D9D0BE3B}"
-	ProjectSection(SolutionItems) = preProject
-		CorpusSpliter\bin\Debug\ItemName.txt = CorpusSpliter\bin\Debug\ItemName.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBController", "DBController\DBController.csproj", "{E5D9A424-3758-4489-9443-8C24B1707E0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigInitializer", "ConfigInitializer\ConfigInitializer.csproj", "{C313FBCB-5080-449C-9A25-A33633F3ADC4}"
