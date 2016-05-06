@@ -44,30 +44,37 @@ namespace DBController
             return ret;
         }
 
-        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection collections, int IncidentId)
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection collections, long IncidentId)
         {
             var queryText = chatlogTable.ToString();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
             using (var transaction = this._connection.BeginTransaction())
             {
+                int TOTAL_DIALOG_NUM = collections.Count;
+                int finished = 0;
                 foreach (Match match in collections)
                 {
                     //INSERT OPERATIONS
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
+                    chatlog.registerSqlCommand(match, ref cmd, 1);
                     try
                     {
                         var ret = cmd.ExecuteNonQuery();
                     }
                     catch
                     {
-                        throw;
+                        Console.WriteLine("Error happens while inserting dialog but was ignored");
+                    }
+                    ++finished;
+                    if(finished%1000 == 0)
+                    {
+                        Console.WriteLine($"[Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
                     }
                 }
                 transaction.Commit();
             }
         }
-        public int BatchInsertIncident(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable)
+        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable)
         {
             var queryText = incidentTable.ToString();
             var incident = new DataNormalizer.DataEntity.Incident(incidentTable);

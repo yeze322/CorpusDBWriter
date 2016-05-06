@@ -20,9 +20,14 @@ namespace ConfigInitializer
             this.TABLE_VALUE_FORMAT = string.Join(",", Enumerable.Range(1, itemNameArray.Length).Select(i => "@" + i.ToString()));
             this.dataTypeList = System.IO.File.ReadAllLines(dataTypeConfig).ToList();
         }
+        private string _tostring = null;
         public override string ToString()
         {
-            return $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ({TABLE_VALUE_FORMAT})";
+            if (this._tostring == null)
+            {
+                this._tostring = $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ({TABLE_VALUE_FORMAT})";
+            }
+            return this._tostring;
         }
     }
 
