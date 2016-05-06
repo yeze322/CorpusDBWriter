@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataNormalizer
+namespace DataNormalizer.DataEntity
 {
-    public class EntityFactory
+    public interface IDataEntity
     {
+        string toJson();
+        string generateJsonTemplate();
     }
 }

@@ -5,10 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace CorpusSpliter.DataEntiyy
+namespace DataNormalizer.DataEntity
 {
-    public class Incident
+    internal enum IMap
     {
+        Id=0,IncidentId,ProductName,ClassificationPath,
+        UnitOfWork,CreateDate,CreatedBy,ImportDate,
+        WorkGroup,SupportOffering,ProblemType,FormFactor,
+        CompanyName,IncidentStatus,ModifiedBy,ModifiedDate,
+        ReviewerComments,IncidentTitle,ProdClassType,MsSolveSrNumber,
+        NumberOfViews,NumberOfVotes,NumberOfMessages,NumberOfUniqueUsers,
+        CaseNotes,Match,toJson,generateJsonTemplate,
+    }
+    public class Incident : IDataEntity
+    {
+        #region dataMembers
         public int Id { get; set; }
         public string IncidentId { get; set; }
         public string ProductName { get; set; }
@@ -34,7 +45,13 @@ namespace CorpusSpliter.DataEntiyy
         public int NumberOfMessages { get; set; }
         public int NumberOfUniqueUsers { get; set; }
         public string CaseNotes { get; set; }
-        public virtual ICollection<ChatLog> ChatLogs { get; set; }
-        public virtual ICollection<QALog> QaLogs { get; set; }
+        #endregion
+
+        public Incident(Match match)
+        {
+            this.IncidentId = match.Groups[(int)IMap.IncidentId].Value;
+        }
+        public string toJson() { return null; }
+        public string generateJsonTemplate() { return null; }
     }
 }
