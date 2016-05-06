@@ -7,7 +7,7 @@ namespace DataNormalizer.DataEntity
     {
         private ConfigInitializer.ChatlogTableEntity tableInfo;
         public ChatLog(ConfigInitializer.ChatlogTableEntity tableEntity) { this.tableInfo = tableEntity; }
-        public void registerSqlCommand(Match match, ref SqlCommand cmd, string IncidentId)
+        public void registerSqlCommand(Match match, ref SqlCommand cmd, int IncidentId)
         {
             cmd.Parameters.AddWithValue("@1", match.Groups[2].Value);
             cmd.Parameters.AddWithValue("@2", match.Groups[3].Value);

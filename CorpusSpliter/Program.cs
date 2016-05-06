@@ -18,10 +18,8 @@ namespace CorpusSpliter
             var chatlogTableEntity = new ConfigInitializer.ChatlogTableEntity(@"./Config/ChatlogItemList.txt", @"./Config/ChatlogDataTypeList.txt");
 
             var rootRegex = new ConfigInitializer.RootRegex(@"./Config/IncidentItemList.txt");
-            var caseRegex = new ConfigInitializer.CaseRegex();
 
             var rootParser = new RootParser(rootRegex.ToString());
-            var caseParser = new CaseNoteParser(caseRegex.ToString());
 
             var dbc = new DBController.DBController(ZIM_TOKEN);
 
@@ -32,8 +30,7 @@ namespace CorpusSpliter
                 string lineCache = System.IO.File.ReadAllText(fname);
                 var incidentCollections = rootParser.executeMatch(lineCache);
                 // insert stem items
-                incidentCount += dbc.BatchInsert(incidentCollections, incidentTableEntity, chatlogTableEntity);
-                // insert dialog messages
+                incidentCount += dbc.BatchInsertIncident(incidentCollections, incidentTableEntity);
             }
             executeExitAction(incidentCount);
         }
