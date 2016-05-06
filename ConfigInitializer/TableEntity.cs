@@ -8,9 +8,20 @@ namespace ConfigInitializer
 {
     public class TableEntity
     {
+        protected List<string> dataTypeList;
         protected string TABLE_NAME = null;
         protected string TABLE_ITEMS = null;
         protected string TABLE_VALUE_FORMAT = null;
+        public TableEntity(string itemNameConfig, string dataTypeConfig)
+        {
+            var itemNameArray = System.IO.File.ReadAllLines(itemNameConfig);
+
+            this.TABLE_ITEMS = string.Join(",", itemNameArray.Select(x => x.Replace(" ", "")).ToList());
+            // [1,2,3....] => "@1,@2,@3..."
+            this.TABLE_VALUE_FORMAT = string.Join(",", Enumerable.Range(1, itemNameArray.Length).Select(i => "@" + i.ToString()));
+
+            this.dataTypeList = System.IO.File.ReadAllLines(dataTypeConfig).ToList();
+        }
         public override string ToString()
         {
             return $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ({TABLE_VALUE_FORMAT})";
@@ -19,15 +30,17 @@ namespace ConfigInitializer
 
     public sealed class IncidentTableEntity : TableEntity
     {
-        public IncidentTableEntity(string itemNameConfig)
+        public IncidentTableEntity(string itemNameConfig, string dataTypeConfig) : base(itemNameConfig, dataTypeConfig)
         {
-            var itemNameArray = System.IO.File.ReadAllLines(itemNameConfig);
-            var columnNameList = itemNameArray.Select(x => x.Replace(" ", "")).ToList();
-
             base.TABLE_NAME = @"dbo.Incidents";
-            base.TABLE_ITEMS = string.Join(",", columnNameList);
-            // [1,2,3....] => "@1,@2,@3..."
-            base.TABLE_VALUE_FORMAT = string.Join(",", Enumerable.Range(1, itemNameArray.Length).Select( i => "@" + i.ToString()));
+        }
+    }
+
+    public sealed class ChatlogTableEntity : TableEntity
+    {
+        public ChatlogTableEntity(string itemNameConfig, string dataTypeConfig) : base(itemNameConfig, dataTypeConfig)
+        {
+            base.TABLE_NAME = @"dbo.ChatLogs";
         }
     }
 }

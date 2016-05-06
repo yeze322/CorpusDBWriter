@@ -9,7 +9,7 @@ namespace UnitTestProject
         [TestMethod]
         public void TableConfig()
         {
-            var rtb = new ConfigInitializer.IncidentTableEntity(@"./Config/ItemList.txt");
+            var rtb = new ConfigInitializer.IncidentTableEntity(@"./Config/ItemList.txt", "asd");
             Console.WriteLine(rtb.ToString());
         }
         [TestMethod]

@@ -19,11 +19,15 @@ namespace CorpusSpliter
         static void Main(string[] args)
         {
             string [] flist = System.IO.Directory.GetFiles("./Corpus");
-            var tableInfo = new DBController.TableInfo(@"./Config/ItemList.txt", @"./Config/DataTypeDiction.json");
-            var rootParser = new RootParser(@"./Config/ItemList.txt");
-            var caseParser = new CaseNoteParser("");
 
-            var dbc = new DBController.DBController(ZIM_TOKEN, tableInfo);
+            var incidentTableEntity = new ConfigInitializer.IncidentTableEntity(@"./Config/ItemList.txt", @"./Config/DataTypeList.txt");
+            var rootRegex = new ConfigInitializer.RootRegex(@"./Config/ItemList.txt");
+            var caseRegex = new ConfigInitializer.CaseRegex();
+
+            var rootParser = new RootParser(rootRegex.ToString());
+            var caseParser = new CaseNoteParser(caseRegex.ToString());
+
+            var dbc = new DBController.DBController(ZIM_TOKEN);
 
             int newCount = 0;
             foreach (var fname in flist)
@@ -32,7 +36,7 @@ namespace CorpusSpliter
                 string lineCache = System.IO.File.ReadAllText(fname);
                 var matchCollections = rootParser.executeMatch(lineCache);
                 // insert stem items
-                newCount += dbc.BatchInsertRegexCollections(matchCollections);
+                newCount += dbc.BatchInsertRegexCollections(incidentTableEntity, matchCollections);
                 // insert dialog messages
             }
             executeExitAction(newCount);

@@ -11,6 +11,7 @@ namespace CorpusSpliter
     {
         MatchCollection executeMatch(string text);
     }
+    
     public class RootParser : IParser
     {
         private Regex _regex = null;

@@ -9,14 +9,11 @@ using System.Text.RegularExpressions;
 
 namespace DBController
 {
-    using SQLAddParaFunc = Func<SqlCommand, string, string, SqlParameter>;
     public class DBController
     {
         private SqlConnection _connection = null;
-        private readonly TableInfo tableInfo = null;
-        public DBController(string connectToken, TableInfo ti)
+        public DBController(string connectToken)
         {
-            this.tableInfo = ti;
             this._connection = new SqlConnection(connectToken);
             try
             {
@@ -47,37 +44,18 @@ namespace DBController
             return ret;
         }
 
-        private static Dictionary<string, SQLAddParaFunc> dbAddParaLambdaDic = new Dictionary<string, SQLAddParaFunc>
+        public int BatchInsertRegexCollections(ConfigInitializer.IncidentTableEntity targetTable, MatchCollection collections, int batchSize = 1000)
         {
-            { "INT", (cmd, col, val) => {
-                return cmd.Parameters.AddWithValue("@"+col, val == "" ? -1 : int.Parse(val));
-            } },
-            { "STRING", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, val); }},
-            { "DATETIME", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, DateTime.Parse(val)); }},
-        };
-
-        private void assignCmdFromMatch(SqlCommand cmd, Match match)
-        {
-
-            for (int i = 0; i < this.tableInfo.columnNameList.Count; i++)
-            {
-                var dataType = this.tableInfo.dataTypeList[i];
-                var columnName = this.tableInfo.columnNameList[i];
-
-                dbAddParaLambdaDic[dataType](cmd, columnName, match.Groups[i + 1].Value);
-            }
-        }
-        // issues: @tableHeader do not contain columns' data type. will use json
-        public int BatchInsertRegexCollections(MatchCollection collections, int batchSize = 1000)
-        {
+            var incident = new DataNormalizer.DataEntity.Incident(targetTable);
             int successCount = 0;
-            var queryText = $"INSERT into {this.tableInfo.tableName} {this.tableInfo.queryItemPattern} VALUES {this.tableInfo.queryValuePattern}";
+            var queryText = targetTable.ToString();
+            //var queryText = $"INSERT into {this.tableInfo.tableName} {this.tableInfo.queryItemPattern} VALUES {this.tableInfo.queryValuePattern}";
             using (var transaction = this._connection.BeginTransaction())
             {
                 foreach (Match match in collections)
                 {
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    this.assignCmdFromMatch(cmd, match);
+                    incident.registerSqlCommand(match, ref cmd);
                     try
                     {
                         cmd.ExecuteNonQuery();

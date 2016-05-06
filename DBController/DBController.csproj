@@ -45,11 +45,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBController.cs" />
-    <Compile Include="TableInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConfigInitializer\ConfigInitializer.csproj">
+      <Project>{c313fbcb-5080-449c-9a25-a33633f3adc4}</Project>
+      <Name>ConfigInitializer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataNormalizer\DataNormalizer.csproj">
+      <Project>{0a967a58-b6fc-47f5-b4a5-64c7612cca0b}</Project>
+      <Name>DataNormalizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

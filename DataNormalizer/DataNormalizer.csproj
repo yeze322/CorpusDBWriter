@@ -48,7 +48,6 @@
     <Compile Include="DataEntity\ChatLog.cs" />
     <Compile Include="DataEntity\Incident.cs" />
     <Compile Include="DataEntity\QALog.cs" />
-    <Compile Include="JsonFactory.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
