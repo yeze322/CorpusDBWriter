@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E5D9A424-3758-4489-9443-8C24B1707E0F}</ProjectGuid>
+    <ProjectGuid>{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DBController</RootNamespace>
-    <AssemblyName>DBController</AssemblyName>
+    <RootNamespace>DataNormalizer</RootNamespace>
+    <AssemblyName>DataNormalizer</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,21 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBController.cs" />
+    <Compile Include="DataEntity\ChatLog.cs" />
+    <Compile Include="DataEntity\Incident.cs" />
+    <Compile Include="DataEntity\QALog.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConfigInitializer\ConfigInitializer.csproj">
       <Project>{c313fbcb-5080-449c-9a25-a33633f3adc4}</Project>
       <Name>ConfigInitializer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataNormalizer\DataNormalizer.csproj">
-      <Project>{0a967a58-b6fc-47f5-b4a5-64c7612cca0b}</Project>
-      <Name>DataNormalizer</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

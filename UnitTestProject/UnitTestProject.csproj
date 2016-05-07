@@ -49,18 +49,25 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
     <Compile Include="RegexTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConfigTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CorpusSpliter\CorpusSpliter.csproj">
-      <Project>{2e577825-6002-45ef-aac4-476b30e52ff7}</Project>
-      <Name>CorpusSpliter</Name>
+    <ProjectReference Include="..\ConfigInitializer\ConfigInitializer.csproj">
+      <Project>{c313fbcb-5080-449c-9a25-a33633f3adc4}</Project>
+      <Name>ConfigInitializer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataNormalizer\DataNormalizer.csproj">
+      <Project>{0a967a58-b6fc-47f5-b4a5-64c7612cca0b}</Project>
+      <Name>DataNormalizer</Name>
     </ProjectReference>
     <ProjectReference Include="..\DBController\DBController.csproj">
       <Project>{e5d9a424-3758-4489-9443-8c24b1707e0f}</Project>

@@ -13,7 +13,9 @@ namespace UnitTestProject
         [TestMethod]
         public void RootRegexTest()
         {
-            RootParser rp = new RootParser(@"./Config/ItemList.txt");
+            var rg = new ConfigInitializer.RootRegex(@"./Config/ItemList.txt");
+            RootParser rp = new RootParser(rg.ToString());
+
             string testCorpus = System.IO.File.ReadAllText(@"sampleCorpus.txt");
             var collection = rp.executeMatch(testCorpus);
             Assert.AreEqual(collection.Count, 1);
@@ -30,7 +32,9 @@ namespace UnitTestProject
         [TestMethod]
         public void CaseNotesRegexTest()
         {
-            CaseNoteParser cp = new CaseNoteParser();
+            var cg = new ConfigInitializer.CaseRegex();
+            CaseNoteParser cp = new CaseNoteParser(cg.ToString());
+
             string testDialog = System.IO.File.ReadAllText(@"sampleDialog.txt");
             var collections = cp.executeMatch(testDialog);
             Assert.AreEqual(collections.Count, 8);

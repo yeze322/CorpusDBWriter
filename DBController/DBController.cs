@@ -9,14 +9,11 @@ using System.Text.RegularExpressions;
 
 namespace DBController
 {
-    using SQLAddParaFunc = Func<SqlCommand, string, string, SqlParameter>;
     public class DBController
     {
         private SqlConnection _connection = null;
-        private readonly TableInfo dbinfo = null;
-        public DBController(string connectToken, TableInfo dbinfo)
+        public DBController(string connectToken)
         {
-            this.dbinfo = dbinfo;
             this._connection = new SqlConnection(connectToken);
             try
             {
@@ -44,40 +41,59 @@ namespace DBController
                 }
                 ret.Add(row);
             }
+            //Avoid Exception:
+            //  There is already an open DataReader associated with this Command
+            reader.Close();
             return ret;
         }
 
-        private static Dictionary<string, SQLAddParaFunc> dbAddParaLambdaDic = new Dictionary<string, SQLAddParaFunc>
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
         {
-            { "INT", (cmd, col, val) => {
-                return cmd.Parameters.AddWithValue("@"+col, val == "" ? -1 : int.Parse(val));
-            } },
-            { "STRING", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, val); }},
-            { "DATETIME", (cmd, col, val) => { return cmd.Parameters.AddWithValue("@"+col, DateTime.Parse(val)); }},
-        };
-
-        private void setInsertCommandValue(SqlCommand cmd, Match match)
-        {
-
-            for (int i = 0; i < this.dbinfo.columnNameList.Count; i++)
+            Console.WriteLine("     [Sub-Chatlog] Inserting...");
+            var queryText = chatlogTable.ToString();
+            var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
+            using (var transaction = this._connection.BeginTransaction())
             {
-                var dataType = this.dbinfo.dataTypeList[i];
-                var columnName = this.dbinfo.columnNameList[i];
-
-                dbAddParaLambdaDic[dataType](cmd, columnName, match.Groups[i + 1].Value);
+                int TOTAL_DIALOG_NUM = chatlogCollections.Count;
+                int finished = 0;
+                foreach (Match match in chatlogCollections)
+                {
+                    //INSERT OPERATIONS
+                    var cmd = new SqlCommand(queryText, this._connection, transaction);
+                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
+                    try
+                    {
+                        var ret = cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Error happens while inserting dialog but was ignored");
+                    }
+                    ++finished;
+                    if(finished%1000 == 0)
+                    {
+                        Console.WriteLine($"        [Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
+                    }
+                }
+                //chatlog.clearState();
+                transaction.Commit();
+                Console.WriteLine($"     [Sub-Chatlog] Insert : Done! IncidentID = {IncidentId}");
             }
         }
-        // issues: @tableHeader do not contain columns' data type. will use json
-        public int BatchInsertRegexCollections(string tableName, MatchCollection collections, int batchSize = 1000)
+        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash)
         {
+            duplicateHash = new HashSet<string>();
+
+            var queryText = incidentTable.ToString();
+            var incident = new DataNormalizer.DataEntity.Incident(incidentTable);
             int successCount = 0;
-            var queryText = $"INSERT into {tableName} {this.dbinfo.queryItemPattern} VALUES {this.dbinfo.queryValuePattern}";
+            //var queryText = $"INSERT into {this.tableInfo.tableName} {this.tableInfo.queryItemPattern} VALUES {this.tableInfo.queryValuePattern}";
             using (var transaction = this._connection.BeginTransaction())
             {
                 foreach (Match match in collections)
                 {
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    this.setInsertCommandValue(cmd, match);
+                    incident.registerSqlCommand(match, ref cmd);
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -86,7 +102,9 @@ namespace DBController
                     }
                     catch
                     {
-                        Console.WriteLine($"Duplicate Incident: {match.Groups[1].Value}");
+                        var incidentString = match.Groups[1].Value;
+                        duplicateHash.Add(incidentString);
+                        Console.WriteLine($"Duplicate Incident: {incidentString}");
                     }
                 }
                 transaction.Commit();

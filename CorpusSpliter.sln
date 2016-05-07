@@ -3,16 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorpusSpliter", "CorpusSpliter\CorpusSpliter.csproj", "{2E577825-6002-45EF-AAC4-476B30E52FF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportApplication", "CorpusSpliter\ImportApplication.csproj", "{2E577825-6002-45EF-AAC4-476B30E52FF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{FF2A1918-CAD2-49DB-B9FD-710408402FD5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F16E87A6-0877-4A5B-AD79-43D5D9D0BE3B}"
-	ProjectSection(SolutionItems) = preProject
-		CorpusSpliter\bin\Debug\ItemName.txt = CorpusSpliter\bin\Debug\ItemName.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBController", "DBController\DBController.csproj", "{E5D9A424-3758-4489-9443-8C24B1707E0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigInitializer", "ConfigInitializer\ConfigInitializer.csproj", "{C313FBCB-5080-449C-9A25-A33633F3ADC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataNormalizer", "DataNormalizer\DataNormalizer.csproj", "{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBTest", "DBTest\DBTest.csproj", "{99C49924-A367-4BFE-BDA4-965DE4A63D93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +33,18 @@ Global
 		{E5D9A424-3758-4489-9443-8C24B1707E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5D9A424-3758-4489-9443-8C24B1707E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5D9A424-3758-4489-9443-8C24B1707E0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C313FBCB-5080-449C-9A25-A33633F3ADC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A967A58-B6FC-47F5-B4A5-64C7612CCA0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C49924-A367-4BFE-BDA4-965DE4A63D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C49924-A367-4BFE-BDA4-965DE4A63D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C49924-A367-4BFE-BDA4-965DE4A63D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C49924-A367-4BFE-BDA4-965DE4A63D93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
