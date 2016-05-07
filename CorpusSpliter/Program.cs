@@ -9,11 +9,11 @@ namespace CorpusSpliter
 {
     class Program
     {
-        private static string ZIM_TOKEN = @"Server=zim-workstation;Database=CSSData;User ID=cssdata;Password=Password1234;";
         static void Main(string[] args)
         {
             string[] flist = System.IO.Directory.GetFiles("./Corpus");
 
+            var ZIM_TOKEN = System.IO.File.ReadAllText("./Config/dbconfig");
             var incidentTableEntity = new ConfigInitializer.IncidentTableEntity(@"./Config/IncidentItemList.txt", @"./Config/IncidentDataTypeList.txt");
             var chatlogTableEntity = new ConfigInitializer.ChatlogTableEntity(@"./Config/ChatlogItemList.txt", @"./Config/ChatlogDataTypeList.txt");
 
