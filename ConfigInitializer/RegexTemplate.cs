@@ -27,7 +27,7 @@ namespace ConfigInitializer
     }
     public sealed class CaseRegex : BaseRegex
     {
-        private static readonly string NAME_CATCH = @"([a-zA-Z]+):";
+        private static readonly string NAME_CATCH = @"([a-zA-Z ]+):";
         private static readonly string NUM2 = @"[0-9]{2}";
         private static readonly string TIME_CATCH = $"(\\[{NUM2}:{NUM2}:{NUM2}\\])";
         private static readonly string SENTENCE_CATCH = "(.*)\r\n";
