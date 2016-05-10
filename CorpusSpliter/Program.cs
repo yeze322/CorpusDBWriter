@@ -58,18 +58,11 @@ namespace CorpusSpliter
                     {
                         var dialogCollections = caseParser.executeMatch(match.Groups[CASENOTES_INDEX].Value);
                         Console.WriteLine("     [Sub-Chatlog] Extracting Chatlogs: Done");
-                        try
-                        {
-                            dbc.BatchInsertDialogCollections(
-                                chatlogTableEntity,
-                                dialogCollections,
-                                IncidentString_Id_Map[match.Groups[1].Value]
-                                );
-                        }
-                        catch
-                        {
-                            Console.WriteLine("===Find Key Failed: " + incidentString);
-                        }
+                        dbc.BatchInsertDialogCollections(
+                            chatlogTableEntity,
+                            dialogCollections,
+                            IncidentString_Id_Map[match.Groups[1].Value]
+                            );
                     }
                 }
             }

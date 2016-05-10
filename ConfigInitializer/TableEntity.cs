@@ -12,8 +12,6 @@ namespace ConfigInitializer
         protected string TABLE_NAME = null;
         protected string TABLE_ITEMS = null;
         protected string TABLE_VALUE_FORMAT = null;
-        private string _toheader = null;
-        private string _tostring = null;
         public TableEntity(string itemNameConfig, string dataTypeConfig)
         {
             var itemNameArray = System.IO.File.ReadAllLines(itemNameConfig);
@@ -21,18 +19,24 @@ namespace ConfigInitializer
             // [1,2,3....] => "@1,@2,@3..."
             this.TABLE_VALUE_FORMAT = string.Join(",", Enumerable.Range(1, itemNameArray.Length).Select(i => "@" + i.ToString()));
             this.dataTypeList = System.IO.File.ReadAllLines(dataTypeConfig).ToList();
-            // insert into xxx values
-            this._toheader = $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ";
-            // insert into xxx values @1@2
-            this._tostring = this._toheader + $"({TABLE_VALUE_FORMAT})";
         }
+        private string _tostring = null;
         public override string ToString()
         {
+            if (this._tostring == null)
+            {
+                this._tostring = $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ({TABLE_VALUE_FORMAT})";
+            }
             return this._tostring;
         }
 
+        private string _toheader = null;
         public string ToHeader()
         {
+            if (this._toheader == null)
+            {
+                this._toheader = $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ";
+            }
             return this._toheader;
         }
     }

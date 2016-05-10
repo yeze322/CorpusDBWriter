@@ -50,19 +50,21 @@ namespace DBController
         private void _executeCMD(string queryText, SqlConnection connection, SqlTransaction transaction)
         {
             var cmd = new SqlCommand(queryText, connection, transaction);
+            cmd.Parameters.AddRange(;
             try
             {
                 var ret = cmd.ExecuteNonQuery();
             }
             catch
             {
+                throw;
                 Console.WriteLine($"Error happens while inserting dialog but was ignored");
             }
         }
         public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
         {
             Console.WriteLine("     [Sub-Chatlog] Inserting...");
-            var queryText = chatlogTable.ToString();
+            var queryText = chatlogTable.ToHeader();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
             using (var transaction = this._connection.BeginTransaction())
             {
@@ -85,7 +87,7 @@ namespace DBController
                     {
                         _executeCMD(queryText, this._connection, transaction);
                         BATCH_COUNT = 0;
-                        queryText = chatlogTable.ToString();
+                        queryText = chatlogTable.ToHeader();
                         finished += 100;
                     }
                 }
