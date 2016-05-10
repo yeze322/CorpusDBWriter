@@ -47,6 +47,17 @@ namespace DBController
             return ret;
         }
 
+        private void _executeCMD(SqlCommand cmd)
+        {
+            try
+            {
+                var ret = cmd.ExecuteNonQuery();
+            }
+            catch
+            {
+                Console.WriteLine($"Error happens while inserting dialog but was ignored");
+            }
+        }
         public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
         {
             Console.WriteLine("     [Sub-Chatlog] Inserting...");
@@ -56,23 +67,67 @@ namespace DBController
             {
                 int TOTAL_DIALOG_NUM = chatlogCollections.Count;
                 int finished = 0;
+
+                string VALUES = "";
+                int BATCH_COUNT = 0;
+
+                int LENGTH = chatlogCollections.Count;
+                if (LENGTH == 0) return;
+                else
+                {
+                    queryText += chatlog.getParameterString(chatlogCollections[0], IncidentId);
+                }
+                for (int i = 1; i < LENGTH; i++)
+                {
+                    var match = chatlogCollections[i];
+                    queryText += "," + chatlog.getParameterString(match, IncidentId);
+                    if (BATCH_COUNT >= 100)
+                    {
+
+                    }
+                    var cmd = new SqlCommand(queryText, this._connection, transaction);
+                    this._executeCMD(cmd);
+                    BATCH_COUNT = 0;
+                    queryText = chatlogTable.ToString();
+                }
+
+
                 foreach (Match match in chatlogCollections)
                 {
-                    //INSERT OPERATIONS
+                    queryText += chatlog.getParameterString(match, IncidentId);
+                    //chatlog.registerSqlCommand(match, ref cmd, IncidentId);
+                    if (BATCH_COUNT >= 100)
+                    {
+                        var cmd = new SqlCommand(queryText, this._connection, transaction);
+                        try
+                        {
+                            var ret = cmd.ExecuteNonQuery();
+                            finished += 100;
+                        }
+                        catch
+                        {
+                            Console.WriteLine($"Error happens while inserting dialog but was ignored");
+                        }
+                        BATCH_COUNT = 0;
+                        queryText = chatlogTable.ToString();
+                    }
+                    else
+                    {
+                        queryText += ',';
+                    }
+                }
+                if (BATCH_COUNT != 0)
+                {
+                    queryText.Remove(queryText.Length - 1);
                     var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
                     try
                     {
                         var ret = cmd.ExecuteNonQuery();
+                        finished += 100;
                     }
                     catch
                     {
-                        Console.WriteLine("Error happens while inserting dialog but was ignored");
-                    }
-                    ++finished;
-                    if(finished%1000 == 0)
-                    {
-                        Console.WriteLine($"        [Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
+                        Console.WriteLine($"Error happens while inserting dialog but was ignored");
                     }
                 }
                 //chatlog.clearState();

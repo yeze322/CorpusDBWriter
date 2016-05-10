@@ -48,6 +48,22 @@ namespace DataNormalizer.DataEntity
             cmd.Parameters.AddWithValue("@5", this.dialogIndex);// Sub Dialog Index
             cmd.Parameters.AddWithValue("@6", this.messageIndex);// Per Dialog Message Index
         }
+        public string getParameterString(Match match, int IncidentId()
+        {
+            this.calculateState(match);
+
+            string lp = "'";
+            string rp = "'";
+            string ret = "(";
+            ret += lp + match.Groups[2].Value + rp + ","; // 'userName',
+            ret += lp + match.Groups[3].Value + rp + ","; // 'content',
+            ret += IncidentId.ToString() + ",";     // incidentId,
+            ret += lp + match.Groups[1].Value + rp + ",";   // 'TimeLabel',
+            ret += this.dialogIndex.ToString() + ","; // Dialog,
+            ret += this.messageIndex.ToString();    // Order
+            ret += ")";
+            return ret;
+        }
 
         // record and split dialog
         public void clearState()
