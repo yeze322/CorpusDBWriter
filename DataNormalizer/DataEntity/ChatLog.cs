@@ -48,7 +48,7 @@ namespace DataNormalizer.DataEntity
             cmd.Parameters.AddWithValue("@5", this.dialogIndex);// Sub Dialog Index
             cmd.Parameters.AddWithValue("@6", this.messageIndex);// Per Dialog Message Index
         }
-        public string getParameterString(Match match, int IncidentId()
+        public string getParameterString(Match match, int IncidentId)
         {
             this.calculateState(match);
 
