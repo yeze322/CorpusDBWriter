@@ -50,7 +50,6 @@ namespace DBController
         private void _executeCMD(string queryText, SqlConnection connection, SqlTransaction transaction)
         {
             var cmd = new SqlCommand(queryText, connection, transaction);
-            cmd.Parameters.AddRange(;
             try
             {
                 var ret = cmd.ExecuteNonQuery();
@@ -74,21 +73,28 @@ namespace DBController
                 int BATCH_COUNT = 0;
 
                 int LENGTH = chatlogCollections.Count;
-                if (LENGTH == 0) return;
-                else
-                {
-                    queryText += chatlog.getParameterString(chatlogCollections[0], IncidentId);
-                }
-                for (int i = 1; i < LENGTH; i++)
+                for (int i = 0; i < LENGTH; i++)
                 {
                     var match = chatlogCollections[i];
-                    queryText += "," + chatlog.getParameterString(match, IncidentId);
-                    if (BATCH_COUNT >= 100 || i == LENGTH - 1)
+                    if (BATCH_COUNT == 0)
                     {
-                        _executeCMD(queryText, this._connection, transaction);
-                        BATCH_COUNT = 0;
-                        queryText = chatlogTable.ToHeader();
-                        finished += 100;
+                        // add head value without ","
+                        queryText += chatlog.getParameterString(chatlogCollections[0], IncidentId);
+                        BATCH_COUNT += 1;
+                    }
+                    else
+                    {
+                        queryText += "," + chatlog.getParameterString(match, IncidentId);
+                        BATCH_COUNT += 1;
+                        // reach BATCH SIZE || last match
+                        if (BATCH_COUNT >= 100 || i == LENGTH - 1)
+                        {
+                            // execute command and reset cmd text
+                            _executeCMD(queryText, this._connection, transaction);
+                            BATCH_COUNT = 0;
+                            queryText = chatlogTable.ToHeader();
+                            finished += 100;
+                        }
                     }
                 }
 

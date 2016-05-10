@@ -56,7 +56,7 @@ namespace DataNormalizer.DataEntity
             string rp = "'";
             string ret = "(";
             ret += lp + match.Groups[2].Value + rp + ","; // 'userName',
-            ret += lp + match.Groups[3].Value + rp + ","; // 'content',
+            ret += lp + match.Groups[3].Value.Replace("'", "''") + rp + ","; // 'content',
             ret += IncidentId.ToString() + ",";     // incidentId,
             ret += lp + match.Groups[1].Value + rp + ",";   // 'TimeLabel',
             ret += this.dialogIndex.ToString() + ","; // Dialog,
