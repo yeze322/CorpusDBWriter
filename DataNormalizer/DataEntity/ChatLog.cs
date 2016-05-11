@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace DataNormalizer.DataEntity
 {
-    public class ChatLog
+    public class ChatLog : IDataEntity
     {
         private ConfigInitializer.ChatlogTableEntity tableInfo;
         public ChatLog(ConfigInitializer.ChatlogTableEntity tableEntity) { this.tableInfo = tableEntity; }

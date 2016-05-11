@@ -56,12 +56,13 @@ namespace DBController
             }
             catch
             {
-                throw;
                 Console.WriteLine($"Error happens while inserting dialog but was ignored");
             }
         }
-        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId, bool SKIP)
         {
+            if (SKIP) return;
+
             Console.WriteLine("     [Sub-Chatlog] Inserting...");
             var queryText = chatlogTable.ToHeader();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
@@ -103,9 +104,11 @@ namespace DBController
                 Console.WriteLine($"     [Sub-Chatlog] Insert : Done! IncidentID = {IncidentId}");
             }
         }
-        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash)
+        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash, bool SKIP)
         {
             duplicateHash = new HashSet<string>();
+            if (SKIP) return 0;
+
 
             var queryText = incidentTable.ToString();
             var incident = new DataNormalizer.DataEntity.Incident(incidentTable);
@@ -133,6 +136,26 @@ namespace DBController
                 transaction.Commit();
             }
             return successCount;
+        }
+        public void InsertIncidentLevel(ConfigInitializer.LevelTableEntity levelTable, MatchCollection collections, int incidentId)
+        {
+            string qText = levelTable.ToString();
+            var cmd = new SqlCommand(qText, this._connection);
+            for (int i = 0; i < 5; i++)
+            {
+                string tag = collections[i].Groups[1].Value;
+                cmd.Parameters.AddWithValue($"@{i + 1}", tag);
+            }
+            cmd.Parameters.AddWithValue($"@6", incidentId);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.WriteLine($" @InsertIncidentLevel : insert {incidentId}");
+            }
+            catch
+            {
+                Console.WriteLine("Error happend at @InsertIncidentLevel");
+            }
         }
         public void ClearTable(string tableName, string pkname)
         {

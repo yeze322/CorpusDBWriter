@@ -56,4 +56,11 @@ namespace ConfigInitializer
             base.TABLE_NAME = @"dbo.ChatLogs";
         }
     }
+    public sealed class LevelTableEntity : TableEntity
+    {
+        public LevelTableEntity(string itemNameConfig, string dataTypeConfig) : base(itemNameConfig, dataTypeConfig)
+        {
+            base.TABLE_NAME = @"dbo.Levels";
+        }
+    }
 }
