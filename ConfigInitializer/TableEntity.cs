@@ -29,6 +29,16 @@ namespace ConfigInitializer
             }
             return this._tostring;
         }
+
+        private string _toheader = null;
+        public string ToHeader()
+        {
+            if (this._toheader == null)
+            {
+                this._toheader = $"INSERT INTO {TABLE_NAME} ({TABLE_ITEMS}) VALUES ";
+            }
+            return this._toheader;
+        }
     }
 
     public sealed class IncidentTableEntity : TableEntity
@@ -44,6 +54,13 @@ namespace ConfigInitializer
         public ChatlogTableEntity(string itemNameConfig, string dataTypeConfig) : base(itemNameConfig, dataTypeConfig)
         {
             base.TABLE_NAME = @"dbo.ChatLogs";
+        }
+    }
+    public sealed class LevelTableEntity : TableEntity
+    {
+        public LevelTableEntity(string itemNameConfig, string dataTypeConfig) : base(itemNameConfig, dataTypeConfig)
+        {
+            base.TABLE_NAME = @"dbo.Levels";
         }
     }
 }

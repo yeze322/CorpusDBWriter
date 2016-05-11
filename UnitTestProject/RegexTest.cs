@@ -57,5 +57,17 @@ namespace UnitTestProject
                 }
             }
         }
+        [TestMethod]
+        public void LevelRegexTest()
+        {
+            var lg = new ConfigInitializer.LevelRegex();
+            var lp = new LevelParser(lg.ToString());
+            string testDialog = System.IO.File.ReadAllText(@"sampleCorpus.txt");
+            var matches = lp.executeMatch(testDialog);
+            Assert.AreEqual(matches.Count, 5);
+            Assert.AreEqual(matches[0].Groups.Count, 2);
+            Assert.AreEqual(matches[0].Groups[1].Value, " Ad and Keyword Management");
+            Assert.AreEqual(matches[4].Groups[1].Value, " Educated customer on how to adjust delivery status");
+        }
     }
 }

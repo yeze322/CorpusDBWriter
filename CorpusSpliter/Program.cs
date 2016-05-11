@@ -9,71 +9,75 @@ namespace CorpusSpliter
 {
     class Program
     {
-        private static string ZIM_TOKEN = @"Server=zim-workstation;Database=CSSData;User ID=cssdata;Password=Password1234;";
         static void Main(string[] args)
         {
+            bool SKIP = true;
+            // init resources and configs
             string[] flist = System.IO.Directory.GetFiles("./Corpus");
+
+            var ZIM_TOKEN = System.IO.File.ReadAllText("./Config/dbconfig");
 
             var incidentTableEntity = new ConfigInitializer.IncidentTableEntity(@"./Config/IncidentItemList.txt", @"./Config/IncidentDataTypeList.txt");
             var chatlogTableEntity = new ConfigInitializer.ChatlogTableEntity(@"./Config/ChatlogItemList.txt", @"./Config/ChatlogDataTypeList.txt");
+            var levelTableEntity = new ConfigInitializer.LevelTableEntity(@"./Config/LevelItemList.txt", @"./Config/LevelDataTypeList.txt");
 
             var rootRegex = new ConfigInitializer.RootRegex(@"./Config/IncidentItemList.txt");
             var caseRegex = new ConfigInitializer.CaseRegex();
+            var levelRegex = new ConfigInitializer.LevelRegex();
 
             var rootParser = new RootParser(rootRegex.ToString());
             var caseParser = new CaseNoteParser(caseRegex.ToString());
+            var levelParser = new LevelParser(levelRegex.ToString());
 
             var dbc = new DBController.DBController(ZIM_TOKEN);
 
-            int incidentCount = 0;
+            // start insert by file
+            int incidentSuccessCount = 0;
             foreach (var fname in flist)
             {
                 Console.WriteLine("[IncidentDB] Importing file : " + fname + "...");
                 string lineCache = System.IO.File.ReadAllText(fname);
                 var incidentCollections = rootParser.executeMatch(lineCache);
 
+                // out parameter, saving dup incident id
                 HashSet<string> dupIncidentList;
                 // insert stem items
-                incidentCount += dbc.BatchInsertIncidentCollections(incidentCollections, incidentTableEntity, out dupIncidentList);
-                // insert dialogs
-
-                int CASENOTES_INDEX = incidentCollections[0].Groups.Count - 1;
+                incidentSuccessCount += dbc.BatchInsertIncidentCollections(incidentCollections, incidentTableEntity, out dupIncidentList, SKIP);
                 Console.WriteLine("[IncidentDB] File imported...");
-
                 // execute query to obtain Map(IncidentId_String, ID_Int)
                 Console.WriteLine("[ChatlogDB] Start Feching ID...");
                 var queryResult = dbc.ExecuteQuery(@"SELECT id, IncidentId FROM dbo.incidents");
                 Dictionary<string, int> IncidentString_Id_Map = queryResult.ToDictionary(x => x[1], x => int.Parse(x[0]));
                 Console.WriteLine("[ChatlogDB] Finish Feching ID!");
 
-                foreach (Match match in incidentCollections)
+                // insert dialogs & case level
+                int CASENOTES_INDEX = incidentCollections[0].Groups.Count - 1;
+                int INCIDENT_INDEX = 1;
+                foreach (Match incidentMatch in incidentCollections)
                 {
-                    var incidentString = match.Groups[1].Value;
-                    if (dupIncidentList.Contains(incidentString))
+                    var incidentString = incidentMatch.Groups[INCIDENT_INDEX].Value;
+                    if (dupIncidentList.Contains(incidentString) || ! IncidentString_Id_Map.ContainsKey(incidentString))
                     {
-                        Console.WriteLine($"skip duplicated incident: {incidentString} ...");
+                        Console.WriteLine($"skip incident: {incidentString} ...");
                         continue;
                     }
-                    else
+
+                    int incidentId = IncidentString_Id_Map[incidentString];
+                    string caseNotesText = incidentMatch.Groups[CASENOTES_INDEX].Value;
+
+                    var dialogCollections = caseParser.executeMatch(caseNotesText);
+                    // insert chalogs' main function
+                    dbc.BatchInsertDialogCollections(chatlogTableEntity, dialogCollections, incidentId, SKIP);
+                    // insert level info's main funciton
+                    var levelCollections = levelParser.executeMatch(caseNotesText);
+                    if (levelCollections.Count == 5)
                     {
-                        var dialogCollections = caseParser.executeMatch(match.Groups[CASENOTES_INDEX].Value);
-                        Console.WriteLine("     [Sub-Chatlog] Extracting Chatlogs: Done");
-                        try
-                        {
-                            dbc.BatchInsertDialogCollections(
-                                chatlogTableEntity,
-                                dialogCollections,
-                                IncidentString_Id_Map[match.Groups[1].Value]
-                                );
-                        }
-                        catch
-                        {
-                            Console.WriteLine("===Find Key Failed: " + incidentString);
-                        }
+                        //assert.equal(levelCollections.groups.count, 5);
+                        dbc.InsertIncidentLevel(levelTableEntity, levelCollections, incidentId);
                     }
                 }
             }
-            executeExitAction(incidentCount);
+            executeExitAction(incidentSuccessCount);
         }
         public static void executeExitAction(int newCount)
         {

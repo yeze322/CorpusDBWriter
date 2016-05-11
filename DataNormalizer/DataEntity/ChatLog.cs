@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace DataNormalizer.DataEntity
 {
-    public class ChatLog
+    public class ChatLog : IDataEntity
     {
         private ConfigInitializer.ChatlogTableEntity tableInfo;
         public ChatLog(ConfigInitializer.ChatlogTableEntity tableEntity) { this.tableInfo = tableEntity; }
@@ -47,6 +47,22 @@ namespace DataNormalizer.DataEntity
             cmd.Parameters.AddWithValue("@4", match.Groups[1].Value); // TimeLabel : string
             cmd.Parameters.AddWithValue("@5", this.dialogIndex);// Sub Dialog Index
             cmd.Parameters.AddWithValue("@6", this.messageIndex);// Per Dialog Message Index
+        }
+        public string getParameterString(Match match, int IncidentId)
+        {
+            this.calculateState(match);
+
+            string lp = "'";
+            string rp = "'";
+            string ret = "(";
+            ret += lp + match.Groups[2].Value + rp + ","; // 'userName',
+            ret += lp + match.Groups[3].Value.Replace("'", "''") + rp + ","; // 'content',
+            ret += IncidentId.ToString() + ",";     // incidentId,
+            ret += lp + match.Groups[1].Value + rp + ",";   // 'TimeLabel',
+            ret += this.dialogIndex.ToString() + ","; // Dialog,
+            ret += this.messageIndex.ToString();    // Order
+            ret += ")";
+            return ret;
         }
 
         // record and split dialog

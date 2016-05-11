@@ -34,4 +34,8 @@ namespace CorpusSpliter
         }
         public MatchCollection executeMatch(string text) { return this._regex.Matches(text); }
     }
+    public class LevelParser : CaseNoteParser
+    {
+        public LevelParser(string reString) : base(reString) { }
+    }
 }

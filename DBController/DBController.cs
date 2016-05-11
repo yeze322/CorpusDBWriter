@@ -47,42 +47,68 @@ namespace DBController
             return ret;
         }
 
-        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId)
+        private void _executeCMD(string queryText, SqlConnection connection, SqlTransaction transaction)
         {
+            var cmd = new SqlCommand(queryText, connection, transaction);
+            try
+            {
+                var ret = cmd.ExecuteNonQuery();
+            }
+            catch
+            {
+                Console.WriteLine($"Error happens while inserting dialog but was ignored");
+            }
+        }
+        public void BatchInsertDialogCollections(ConfigInitializer.ChatlogTableEntity chatlogTable, MatchCollection chatlogCollections, int IncidentId, bool SKIP)
+        {
+            if (SKIP) return;
+
             Console.WriteLine("     [Sub-Chatlog] Inserting...");
-            var queryText = chatlogTable.ToString();
+            var queryText = chatlogTable.ToHeader();
             var chatlog = new DataNormalizer.DataEntity.ChatLog(chatlogTable);
             using (var transaction = this._connection.BeginTransaction())
             {
                 int TOTAL_DIALOG_NUM = chatlogCollections.Count;
                 int finished = 0;
-                foreach (Match match in chatlogCollections)
+
+                int BATCH_COUNT = 0;
+
+                int LENGTH = chatlogCollections.Count;
+                for (int i = 0; i < LENGTH; i++)
                 {
-                    //INSERT OPERATIONS
-                    var cmd = new SqlCommand(queryText, this._connection, transaction);
-                    chatlog.registerSqlCommand(match, ref cmd, IncidentId);
-                    try
+                    var match = chatlogCollections[i];
+                    if (BATCH_COUNT == 0)
                     {
-                        var ret = cmd.ExecuteNonQuery();
+                        // add head value without ","
+                        queryText += chatlog.getParameterString(chatlogCollections[0], IncidentId);
+                        BATCH_COUNT += 1;
                     }
-                    catch
+                    else
                     {
-                        Console.WriteLine("Error happens while inserting dialog but was ignored");
-                    }
-                    ++finished;
-                    if(finished%1000 == 0)
-                    {
-                        Console.WriteLine($"        [Inserting Dialogs] Progress: {finished}/{TOTAL_DIALOG_NUM}");
+                        queryText += "," + chatlog.getParameterString(match, IncidentId);
+                        BATCH_COUNT += 1;
+                        // reach BATCH SIZE || last match
+                        if (BATCH_COUNT >= 100 || i == LENGTH - 1)
+                        {
+                            // execute command and reset cmd text
+                            _executeCMD(queryText, this._connection, transaction);
+                            BATCH_COUNT = 0;
+                            queryText = chatlogTable.ToHeader();
+                            finished += 100;
+                        }
                     }
                 }
+
                 //chatlog.clearState();
                 transaction.Commit();
                 Console.WriteLine($"     [Sub-Chatlog] Insert : Done! IncidentID = {IncidentId}");
             }
         }
-        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash)
+        public int BatchInsertIncidentCollections(MatchCollection collections, ConfigInitializer.IncidentTableEntity incidentTable, out HashSet<string> duplicateHash, bool SKIP)
         {
             duplicateHash = new HashSet<string>();
+            if (SKIP) return 0;
+
 
             var queryText = incidentTable.ToString();
             var incident = new DataNormalizer.DataEntity.Incident(incidentTable);
@@ -110,6 +136,26 @@ namespace DBController
                 transaction.Commit();
             }
             return successCount;
+        }
+        public void InsertIncidentLevel(ConfigInitializer.LevelTableEntity levelTable, MatchCollection collections, int incidentId)
+        {
+            string qText = levelTable.ToString();
+            var cmd = new SqlCommand(qText, this._connection);
+            for (int i = 0; i < 5; i++)
+            {
+                string tag = collections[i].Groups[1].Value;
+                cmd.Parameters.AddWithValue($"@{i + 1}", tag);
+            }
+            cmd.Parameters.AddWithValue($"@6", incidentId);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                Console.WriteLine($" @InsertIncidentLevel : insert {incidentId}");
+            }
+            catch
+            {
+                Console.WriteLine("Error happend at @InsertIncidentLevel");
+            }
         }
         public void ClearTable(string tableName, string pkname)
         {

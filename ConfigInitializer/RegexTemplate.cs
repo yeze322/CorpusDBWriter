@@ -38,4 +38,11 @@ namespace ConfigInitializer
             base.reString = SENTENCE;
         }
     }
+    public sealed class LevelRegex : BaseRegex
+    {
+        public LevelRegex()
+        {
+            base.reString = "Level [1-5]:(.*)\r\n";
+        }
+    }
 }
