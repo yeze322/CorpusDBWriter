@@ -11,7 +11,7 @@ namespace CorpusSpliter
     {
         static void Main(string[] args)
         {
-            bool SKIP = true;
+            bool SKIP = false;
             // init resources and configs
             string[] flist = System.IO.Directory.GetFiles("./Corpus");
 
